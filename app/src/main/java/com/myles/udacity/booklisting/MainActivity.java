@@ -1,11 +1,15 @@
 package com.myles.udacity.booklisting;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,34 +37,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /**
-        Book book1 = new Book(
-                "Book 1 Title",
-                new String[]{"Author"},
-                "ORelly",
-                new Date()
-        );
-        Book book2 = new Book(
-                "Book 2 Title",
-                new String[]{"Author"},
-                "ORelly",
-                new Date()
-        );
-        Book book3 = new Book(
-                "Book 3 Title",
-                new String[]{"Author"},
-                "ORelly",
-                new Date()
-        );
+        ((ListView)this.findViewById(R.id.list)).setEmptyView((TextView)findViewById(R.id.empty_view));
 
-        ArrayList<Book> books = new ArrayList<Book>();
-        books.add(book1);
-        books.add(book2);
-        books.add(book3);
-
-        BookAdapter adapter = new BookAdapter(this, books);
-        ((ListView)this.findViewById(R.id.list)).setAdapter(adapter);
-        */
         BookAsyncTask task = new BookAsyncTask();
         Log.v("Myles Debug", "Startng the task");
         task.execute();
@@ -70,6 +48,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected List<Book> doInBackground(URL... urls) {
+            ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            if (networkInfo == null || !networkInfo.isConnected()){
+                Log.v("Myles Debug", "No connection");
+                return null;
+            }
             URL url = null;
             Log.v("Myles Debug", "Startng the background job");
             try {
@@ -88,10 +72,12 @@ public class MainActivity extends AppCompatActivity {
                 urlConnection.setReadTimeout(10000 /* milliseconds */);
                 urlConnection.setConnectTimeout(15000 /* milliseconds */);
                 urlConnection.connect();
-                inputStream = urlConnection.getInputStream();
-                jsonResponse = readFromStream(inputStream);
+                if(urlConnection.getResponseCode()==200) {
+                    inputStream = urlConnection.getInputStream();
+                    jsonResponse = readFromStream(inputStream);
+                }
             } catch (IOException e) {
-                // TODO: Handle the exception
+                e.printStackTrace();
             } finally {
                 if (urlConnection != null) {
                     urlConnection.disconnect();

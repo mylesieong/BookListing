@@ -12,6 +12,10 @@ public class Book {
     private String mPublisher;
     private Date mPublishDate;
 
+    public Book(String title){
+        this.mTitle = title;
+    }
+
     public Book(String title, String[] authors, String publisher, Date publishDate){
         this.mTitle = title;
         this.mAuthors = authors;

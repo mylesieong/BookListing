@@ -136,7 +136,11 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject firstFeature = featureArray.getJSONObject(i);
                     JSONObject properties = firstFeature.getJSONObject("volumeInfo");
                     String title = properties.getString("title");
-                    Book book = new Book(title);
+                    String publisher = properties.getString("publisher");
+                    //Date date = properties.getString("publishedDate");
+                    Book book = new Book();
+                    book.setTitle(title);
+                    book.setPublisher(publisher);
                     Log.v("Myles Debug", "add the book-" + book.getTitle() );
                     books.add(book);
                 }

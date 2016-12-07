@@ -12,6 +12,10 @@ public class Book {
     private String mPublisher;
     private Date mPublishDate;
 
+    public Book(){
+        super();
+    }
+
     public Book(String title){
         this.mTitle = title;
     }

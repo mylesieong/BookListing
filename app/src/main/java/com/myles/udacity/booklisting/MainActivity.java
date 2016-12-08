@@ -6,8 +6,12 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -30,18 +34,36 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final String BOOK_API_REQUEST_URL =
-            "https://www.googleapis.com/books/v1/volumes?q=android&maxResults=3";
+            "https://www.googleapis.com/books/v1/volumes?maxResults=3&q=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Set Empty view for listview
         ((ListView)this.findViewById(R.id.list)).setEmptyView((TextView)findViewById(R.id.empty_view));
 
-        BookAsyncTask task = new BookAsyncTask();
-        Log.v("Myles Debug", "Startng the task");
-        task.execute();
+        //Setup button onclick listener to activate the task
+        ((Button)findViewById(R.id.button_search)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.v("Myles Debug", "User clicks the search button");
+                String searchQuery = ((TextView)findViewById(R.id.text_input)).getText().toString();
+                BookAsyncTask task = new BookAsyncTask();
+                Log.v("Myles Debug", "Form the URL");
+                URL searchUrl = null;
+                try {
+                    searchUrl = new URL(BOOK_API_REQUEST_URL + searchQuery);
+                } catch (MalformedURLException e) {
+                    Log.e("Myles:MalformedURL", "Error with creating URL");
+                }
+                Log.v("Myles Debug", "Startng the task");
+                task.execute(searchUrl);
+            }
+        });
+
+
     }
 
     private class BookAsyncTask extends AsyncTask<URL, Void, List<Book>> {
@@ -54,14 +76,16 @@ public class MainActivity extends AppCompatActivity {
                 Log.v("Myles Debug", "No connection");
                 return null;
             }
-            URL url = null;
-            Log.v("Myles Debug", "Startng the background job");
+            /**
             try {
                 url = new URL(BOOK_API_REQUEST_URL);
             } catch (MalformedURLException e) {
                 Log.e("Myles:MalformedURL", "Error with creating URL");
                 return null;
             }
+             */
+            Log.v("Myles Debug", "Startng the background job");
+            URL url =  urls[0];
             String jsonResponse = "";
             HttpURLConnection urlConnection = null;
             InputStream inputStream = null;
